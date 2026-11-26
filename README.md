@@ -16,15 +16,23 @@
    - 운영: `https://YOUR-DOMAIN/auth/confirm`
 4. **Authentication > Users**에서 플랫폼 관리자 계정 생성 후 `supabase/bootstrap_platform_admin.sql` 실행
 
-### 2. Vercel 배포 (웹앱 + 매일 08:00 KST 자동 수집)
+### 2. Vercel 배포 (무료 Hobby 플랜 기준)
 1. [vercel.com/new](https://vercel.com/new)에서 이 저장소 연결
-2. **Root Directory**를 **`web`**으로 지정 (`web/vercel.json`의 Cron 설정이 자동 인식됩니다)
+2. **Root Directory**를 **`web`**으로 지정
 3. **Environment Variables** 등록 (`web/.env.example` 참고):
    - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
    - `NEXT_PUBLIC_SITE_URL` (배포된 Vercel 도메인)
    - `GEMINI_API_KEY` (선택: `GEMINI_MODEL=gemini-2.5-flash`)
    - `RESEND_API_KEY`, `RESEND_FROM_EMAIL`
-   - `CRON_SECRET` (임의의 긴 문자열 — Vercel Cron 호출 인증용)
+   - `CRON_SECRET` (임의의 긴 문자열 — 크론 호출 인증용)
+
+### 3. 매시간 자동 수집 스케줄 연결 (무료)
+Vercel 무료 플랜은 하루 1회 Cron만 허용하므로, 하루 2회 이상 수집을 위해 무료 스케줄러([cron-job.org](https://cron-job.org))를 연결합니다.
+- **URL**: `https://YOUR-DOMAIN.vercel.app/api/cron/daily-briefing`
+- **Schedule**: 매시간 정각 (`Every hour at :00`)
+- **Headers**: `Authorization: Bearer <CRON_SECRET 값>`
+
+*(추후 상용 판매 시 Vercel Pro로 전환하면 `web/vercel.json`에 `0 * * * *` Cron을 추가해 외부 스케줄러 없이도 동작합니다.)*
 
 ### 3. 로컬 실행
 ```powershell
