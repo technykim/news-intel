@@ -23,15 +23,19 @@ export function verifyUnsubscribe(orgId: string, email: string, sig: string): bo
 }
 
 export async function sendResendEmail(params: {
-  to: string;
+  to: string | string[];
   subject: string;
   html: string;
+  attachments?: { filename: string; content: string }[];
 }): Promise<{ ok: boolean; error?: string }> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const from = process.env.RESEND_FROM_EMAIL?.trim();
   if (!apiKey || !from) {
     return { ok: false, error: "RESEND_API_KEY 또는 RESEND_FROM_EMAIL 환경변수가 설정되지 않았습니다." };
   }
+
+  const recipients = Array.isArray(params.to) ? params.to : [params.to];
+  if (!recipients.length) return { ok: false, error: "수신자가 없습니다." };
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -41,9 +45,10 @@ export async function sendResendEmail(params: {
     },
     body: JSON.stringify({
       from,
-      to: [params.to],
+      to: recipients,
       subject: params.subject,
       html: params.html,
+      ...(params.attachments?.length ? { attachments: params.attachments } : {}),
     }),
   });
 

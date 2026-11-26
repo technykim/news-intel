@@ -1,4 +1,6 @@
 import Link from "next/link";
+import ActionForm from "@/components/ActionForm";
+import { triggerManualRun } from "@/app/actions/runner";
 import { requireProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -32,6 +34,18 @@ export default async function DashboardPage() {
             <h3>누적 수집 기사</h3>
             <div className="stat-num">{articleCount ?? 0}</div>
           </div>
+        </div>
+        <div className="card">
+          <h3>수동 수집 실행</h3>
+          <p className="muted small">
+            자동 수집은 Vercel Cron으로 매일 아침 08:00(KST)에 실행됩니다. 아래 버튼으로 즉시 테스트할 수 있습니다.
+          </p>
+          <ActionForm action={triggerManualRun} submitLabel="전체 고객사 지금 수집 실행" className="form form-row">
+            <label style={{ flexDirection: "row", alignItems: "center", fontWeight: 400 }}>
+              <input type="checkbox" name="send_email" style={{ width: "auto" }} />
+              브리핑 메일도 함께 발송
+            </label>
+          </ActionForm>
         </div>
       </>
     );
@@ -89,6 +103,21 @@ export default async function DashboardPage() {
           <Link href="/targets" className="small">타겟 회사 DB →</Link>
         </div>
       </div>
+
+      {profile.role === "org_admin" && (
+        <div className="card">
+          <h3>수동 수집 실행</h3>
+          <p className="muted small">
+            자동 수집은 Vercel Cron으로 매일 아침 08:00(KST)에 실행됩니다. 등록한 키워드로 지금 바로 수집·AI 분석을 테스트할 수 있습니다.
+          </p>
+          <ActionForm action={triggerManualRun} submitLabel="지금 바로 수집·분석 실행" className="form form-row">
+            <label style={{ flexDirection: "row", alignItems: "center", fontWeight: 400 }}>
+              <input type="checkbox" name="send_email" style={{ width: "auto" }} />
+              브리핑 메일도 함께 발송
+            </label>
+          </ActionForm>
+        </div>
+      )}
     </>
   );
 }
