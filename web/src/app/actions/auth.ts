@@ -29,7 +29,7 @@ export async function requestPasswordReset(_: FormState, formData: FormData): Pr
 
   const supabase = await createClient();
   await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${siteUrl()}/auth/confirm?next=/set-password`,
+    redirectTo: `${siteUrl()}/auth/callback?next=/set-password`,
   });
   // Same message whether or not the account exists (prevents account enumeration).
   return { ok: "가입된 이메일이라면 비밀번호 재설정 링크가 발송되었습니다." };

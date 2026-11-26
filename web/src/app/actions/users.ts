@@ -11,7 +11,7 @@ async function invite(email: string, name: string, orgId: string, role: Role): P
   const admin = createAdminClient();
   const { error } = await admin.auth.admin.inviteUserByEmail(email, {
     data: { org_id: orgId, role, name },
-    redirectTo: `${siteUrl()}/auth/confirm?next=/set-password`,
+    redirectTo: `${siteUrl()}/auth/callback?next=/set-password`,
   });
   if (error) {
     if (/already/i.test(error.message)) return { error: "이미 등록된 이메일입니다." };
