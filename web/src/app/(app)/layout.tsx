@@ -22,6 +22,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           {profile.org_id && <Link href="/campaigns">마케팅 발송</Link>}
           {profile.org_id && <Link href="/settings/keywords">키워드 관리</Link>}
           {profile.org_id && <Link href="/settings/recipients">수신자 관리</Link>}
+          {profile.org_id && <Link href="/settings/schedule">수집 시간</Link>}
           {profile.role === "org_admin" && <Link href="/settings/users">사용자 관리</Link>}
           {profile.role === "platform_admin" && <Link href="/admin">고객사 관리</Link>}
           <Link href="/set-password">비밀번호 변경</Link>

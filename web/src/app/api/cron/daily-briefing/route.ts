@@ -1,11 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { runDailyBriefing } from "@/lib/worker/runner";
+import { runScheduledBriefings } from "@/lib/worker/runner";
 
 export const maxDuration = 60;
 
 /**
- * Vercel Cron endpoint (configured in web/vercel.json: daily 08:00 KST / 23:00 UTC).
- * Vercel automatically sends `Authorization: Bearer <CRON_SECRET>`.
+ * Vercel Cron endpoint (configured in web/vercel.json: hourly `0 * * * *`).
+ * Checks organizations with an active schedule matching the current KST hour.
+ * Optional `?hour=8` query param overrides the hour for manual testing.
  */
 export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET?.trim();
@@ -15,6 +16,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const summaries = await runDailyBriefing();
-  return NextResponse.json({ ok: true, summaries });
+  const hourParam = request.nextUrl.searchParams.get("hour");
+  const parsedHour = hourParam !== null ? Number(hourParam) : undefined;
+  const result = await runScheduledBriefings(
+    Number.isInteger(parsedHour) ? parsedHour : undefined
+  );
+
+  return NextResponse.json({ ok: true, ...result });
 }

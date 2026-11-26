@@ -42,6 +42,7 @@ export async function createOrganization(_: FormState, formData: FormData): Prom
     await admin.from("organizations").delete().eq("id", org.id);
     return result;
   }
+  await admin.from("schedules").insert({ org_id: org.id, hour_kst: 8, send_email: true, active: true });
   revalidatePath("/admin");
   return { ok: `'${orgName}' 고객사를 만들었습니다. ${result?.ok}` };
 }

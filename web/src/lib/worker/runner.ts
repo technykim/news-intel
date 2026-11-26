@@ -230,3 +230,35 @@ export async function runDailyBriefing(options?: {
 
   return summaries;
 }
+
+/**
+ * Runs briefings for organizations that have an active schedule matching `targetHourKst`
+ * (defaults to the current KST hour). Called hourly by Vercel Cron.
+ */
+export async function runScheduledBriefings(targetHourKst?: number): Promise<{
+  hourKst: number;
+  summaries: OrgRunSummary[];
+}> {
+  const nowKst = new Date(Date.now() + 9 * 60 * 60 * 1000);
+  const hourKst =
+    typeof targetHourKst === "number" && targetHourKst >= 0 && targetHourKst <= 23
+      ? targetHourKst
+      : nowKst.getUTCHours();
+
+  const admin = createAdminClient();
+  const { data: rows } = await admin
+    .from("schedules")
+    .select("org_id, send_email")
+    .eq("hour_kst", hourKst)
+    .eq("active", true);
+
+  const summaries: OrgRunSummary[] = [];
+  for (const row of rows ?? []) {
+    const res = await runDailyBriefing({
+      orgId: row.org_id,
+      skipEmail: !row.send_email,
+    });
+    summaries.push(...res);
+  }
+  return { hourKst, summaries };
+}
