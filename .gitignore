@@ -1,0 +1,20 @@
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
